@@ -24,16 +24,14 @@
 #include "renderer.h"
 #include "mandelbox.h"
 
-void getParameters(char *filename, CameraParams *camera_params, RenderParams *renderer_params,
-		   MandelBoxParams *mandelBox_paramsP);
+void getParameters(char *filename, CameraParams *camera_params, RenderParams *renderer_params, MandelBoxParams *mandelBox_params);
 void init3D       (CameraParams *camera_params, const RenderParams *renderer_params);
-void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, unsigned char* image);
+void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, unsigned char* image, MandelBoxParams &mandelBox_params);
 void saveBMP      (const char* filename, const unsigned char* image, int width, int height);
-
-MandelBoxParams mandelBox_params;
 
 int main(int argc, char** argv)
 {
+  MandelBoxParams mandelBox_params;
   CameraParams    camera_params;
   RenderParams    renderer_params;
   
@@ -44,7 +42,7 @@ int main(int argc, char** argv)
 
   init3D(&camera_params, &renderer_params);
 
-  renderFractal(camera_params, renderer_params, image);
+  renderFractal(camera_params, renderer_params, image, mandelBox_params);
   
   saveBMP(renderer_params.file_name, image, renderer_params.width, renderer_params.height);
   

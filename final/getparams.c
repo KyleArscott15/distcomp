@@ -27,13 +27,12 @@
 
 #define BUF_SIZE 1024
 
-static char buf[BUF_SIZE];
-
 void getParameters(char *filename, CameraParams *camP, RenderParams *renP, MandelBoxParams *boxP)
 {
   FILE *fp;
   int ret;
   double *d;
+  char buf[BUF_SIZE];
   
   renP->fractalType = 0;
   renP->maxRaySteps = 8000;

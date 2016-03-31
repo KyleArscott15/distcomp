@@ -26,11 +26,32 @@
 #include "renderer.h"
 #include "mandelboxde.h"
 
-extern double DE(const vec3 &p);
-void normal (const vec3 & p, vec3 & normal);
+extern double DE(const vec3 &p, MandelBoxParams &mandelBox_params);
 
-void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, double eps,
-	      pixelData& pix_data)
+static inline void normal(const vec3 & p, vec3 & normal, MandelBoxParams &mandelBox_params)
+{
+  // compute the normal at p
+  const double sqrt_mach_eps = 1.4901e-08;
+
+  double eps = std::max( MAGNITUDE_RET(p), 1.0 )*sqrt_mach_eps;
+
+  vec3 e1 = {eps, 0,   0};
+  vec3 e2 = {0  , eps, 0};
+  vec3 e3 = {0  , 0, eps};
+
+  vec3 ppe1 = PLUS(p, e1);
+  vec3 pme1 = SUB(p, e1);
+  vec3 ppe2 = PLUS(p, e2);
+  vec3 pme2 = SUB(p, e2);
+  vec3 ppe3 = PLUS(p, e3);
+  vec3 pme3 = SUB(p, e3);
+
+  normal = {DE(ppe1,mandelBox_params)-DE(pme1,mandelBox_params), DE(ppe2,mandelBox_params)-DE(pme2,mandelBox_params), DE(ppe3,mandelBox_params)-DE(pme3,mandelBox_params)};
+  
+  NORMALIZE(normal);
+}
+
+void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, double eps, pixelData& pix_data, MandelBoxParams &mandelBox_params)
 {
   double dist = 0.0;
   double totalDist = 0.0;
@@ -46,7 +67,7 @@ void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &
       //p = from + direction * totalDist;
       p = MULK(direction, totalDist);
       p = PLUS(p, from);
-      dist = DE(p);
+      dist = DE(p,mandelBox_params);
       
       totalDist += .95*dist;
       
@@ -68,33 +89,9 @@ void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &
       //figure out the normal of the surface at this point
       vec3 normPos = MULK(direction, epsModified); // XXX was const
       normPos = SUB(p, normPos);
-      normal(normPos, pix_data.normal);
+      normal(normPos, pix_data.normal, mandelBox_params);
     }
   else 
     //we have the background colour
     pix_data.escaped = true;
-}
-
-
-void normal(const vec3 & p, vec3 & normal)
-{
-  // compute the normal at p
-  const double sqrt_mach_eps = 1.4901e-08;
-
-  double eps = std::max( MAGNITUDE_RET(p), 1.0 )*sqrt_mach_eps;
-
-  vec3 e1 = {eps, 0,   0};
-  vec3 e2 = {0  , eps, 0};
-  vec3 e3 = {0  , 0, eps};
-
-  vec3 ppe1 = PLUS(p, e1);
-  vec3 pme1 = SUB(p, e1);
-  vec3 ppe2 = PLUS(p, e2);
-  vec3 pme2 = SUB(p, e2);
-  vec3 ppe3 = PLUS(p, e3);
-  vec3 pme3 = SUB(p, e3);
-
-  normal = {DE(ppe1)-DE(pme1), DE(ppe2)-DE(pme2), DE(ppe3)-DE(pme3)};
-  
-  NORMALIZE(normal);
 }

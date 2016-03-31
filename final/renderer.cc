@@ -33,14 +33,13 @@
 extern double getTime();
 extern void   printProgress( double perc, double time );
 
-extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, double eps, pixelData &pix_data);
+extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, double eps, pixelData &pix_data, MandelBoxParams &mandelBox_params);
 extern vec3 getColour(const pixelData &pixData, const RenderParams &render_params,
 		      const vec3 &from, const vec3  &direction);
 
 extern void foo();
 
-void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, 
-		   unsigned char* image)
+void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, unsigned char* image, MandelBoxParams &mandelBox_params)
 {
   const double eps = pow(10.0, renderer_params.detail); 
   vec3 from;
@@ -51,19 +50,8 @@ void renderFractal(const CameraParams &camera_params, const RenderParams &render
   const int width  = renderer_params.width;
   int j;
   //double time = getTime();
-  //int i=465,j=57,k;
-
-//*
   
-omp_set_num_threads(4); 
-
-//private(j,to,from,pix_data,color,time,farPoint) shared(camera_params,renderer_params)
-// default(none)shared(image,camera_params,renderer_params)
-//shared(image)//default(none) //default(shared)
-//#pragma omp for private(i,farPoint,from,to,color,pix_data,camera_params,renderer_params)
-
-//#pragma omp parallel 
-#pragma omp parallel for //default(none) shared(from,image,camera_params,renderer_params)
+#pragma omp parallel for default(shared) schedule(dynamic) num_threads(3)
   for(j = 0; j < height; j++){
       int i=0;  
       for(i = 0; i <width; i++){
@@ -75,7 +63,8 @@ omp_set_num_threads(4);
 	  foo();
 
 	  // get point on the 'far' plane
-	  // since we render one frame only, we can use the more specialized method
+	  // since we render one frame only, 
+	  // we can use the more specialized method
 	  UnProject(i, j, camera_params, farPoint);
 	  
 	  // to = farPoint - camera_params.camPos
@@ -83,7 +72,7 @@ omp_set_num_threads(4);
 	  NORMALIZE(to);
 	  
 	  //render the pixel
-	  rayMarch(renderer_params, from, to, eps, pix_data);
+	  rayMarch(renderer_params, from, to, eps, pix_data, mandelBox_params);
 
 	  //get the colour at this pixel
 	  color = getColour(pix_data, renderer_params, from, to);
