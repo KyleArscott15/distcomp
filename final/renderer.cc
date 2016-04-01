@@ -51,7 +51,7 @@ void renderFractal(const CameraParams &camera_params, const RenderParams &render
   int j;
   //double time = getTime();
   
-#pragma omp parallel for default(shared) schedule(dynamic) num_threads(3)
+#pragma omp parallel for default(shared) schedule(dynamic) num_threads(4)
   for(j = 0; j < height; j++){
       int i=0;  
       for(i = 0; i <width; i++){

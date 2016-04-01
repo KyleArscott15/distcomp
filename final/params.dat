@@ -9,9 +9,9 @@
 1
 # IMAGE
 # width height
-1000 1000
+500 500
 # detail level, the smaller the more detailed (-3)
--4
+-3.0
 # MANDELBOX
 # scale, rMin, rFixed  (2 0.5 1)  # KA scale is the order of the box?
 2  0.5 1
