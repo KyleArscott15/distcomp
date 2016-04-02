@@ -1,0 +1,14 @@
+
+# ALL FILES from kyle to amazon
+scp -i ~/.ssh/Kyle-key-pair-oregon.pem `find . -maxdepth 1 -type f` ec2-user@ec2-52-34-230-166.us-west-2.compute.amazonaws.com:~
+
+# from amazon to kyle
+scp -i ~/.ssh/Kyle-key-pair-oregon.pem ec2-user@ec2-52-34-230-166.us-west-2.compute.amazonaws.com:~/image.bmp .image.bmp                                                
+
+# on kyles desktop, 1 core, using original files
+params.dat   14.1 seconds
+params1.dat  6.3-4 seconds
+params2.dat  1.46 seconds 
+params3.dat  9.93 seconds
+params4.dat  10.7 seconds
+params5.dat  34.3 seconds   # why does this make 0?
