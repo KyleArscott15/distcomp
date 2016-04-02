@@ -26,14 +26,14 @@
 #include "renderer.h"
 #include "mandelboxde.h"
 
-extern double DE(const vec3 &p, MandelBoxParams &mandelBox_params);
+extern float DE(const vec3 &p, MandelBoxParams &mandelBox_params);
 
 static inline void normal(const vec3 & p, vec3 & normal, MandelBoxParams &mandelBox_params)
 {
   // compute the normal at p
-  const double sqrt_mach_eps = 1.4901e-08;
+  const float sqrt_mach_eps = 3.4527e-04;// 1.4901e-08;
 
-  double eps = std::max( MAGNITUDE_RET(p), 1.0 )*sqrt_mach_eps;
+  float eps = std::max( MAGNITUDE_RET(p), 1.0 )*sqrt_mach_eps;
 
   vec3 e1 = {eps, 0,   0};
   vec3 e2 = {0  , eps, 0};
@@ -51,14 +51,14 @@ static inline void normal(const vec3 & p, vec3 & normal, MandelBoxParams &mandel
   NORMALIZE(normal);
 }
 
-void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, double eps, pixelData& pix_data, MandelBoxParams &mandelBox_params)
+void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, float eps, pixelData& pix_data, MandelBoxParams &mandelBox_params)
 {
-  double dist = 0.0;
-  double totalDist = 0.0;
+  float dist = 0.0;
+  float totalDist = 0.0;
   
   // We will adjust the minimum distance based on the current zoom
 
-  double epsModified = 0.0;
+  float epsModified = 0.0;
   
   int steps=0;
   vec3 p;

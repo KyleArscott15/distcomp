@@ -31,7 +31,7 @@ void getParameters(char *filename, CameraParams *camP, RenderParams *renP, Mande
 {
   FILE *fp;
   int ret;
-  double *d;
+  float *d;
   char buf[BUF_SIZE];
   
   renP->fractalType = 0;
@@ -64,21 +64,21 @@ void getParameters(char *filename, CameraParams *camP, RenderParams *renP, Mande
 	  //camera position
 	case 0:
 	  d = camP->camPos;
-	  sscanf(buf, "%lf %lf %lf", d, d+1, d+2);
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
 	  break;
 	case 1:
 	  //camera target
 	  d = camP->camTarget;
-	  sscanf(buf, "%lf %lf %lf", d, d+1, d+2);
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
 	  break;
 	  //camera up 
 	case 2:
 	  d = camP->camUp;
-	  sscanf(buf, "%lf %lf %lf", d, d+1, d+2);
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
 	  break;
 	  //field of view
 	case 3:
-	  sscanf(buf, "%lf", &camP->fov);
+	  sscanf(buf, "%f", &camP->fov);
 	  break;
 	  
 	  //IMAGE

@@ -4,3 +4,4 @@ rm gmon.out
 rm *.bmp
 rm *.png
 rm *.jpg
+rm tags

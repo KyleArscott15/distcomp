@@ -5,11 +5,12 @@
 #include <accelmath.h>
 #else
 #include <math.h>
+//include <cmath>
 #endif
 
 // http://stackoverflow.com/questions/13706809/structs-in-c-with-initial-values
 typedef struct {
-  double x, y, z;
+  float x, y, z;
 }  vec3;
 
 // SetDoublePoint
@@ -22,11 +23,11 @@ typedef struct {
 #define SUB(v1,v2)  {v1.x-v2.x, v1.y-v2.y, v1.z-v2.z} // inline vec3 operator- (const vec3& V2) const //XXX different behavior then before, now it modifies v1 in place instead of returning new vec3
 #define SUBP(v1,arr) {v1.x-arr[0], v1.y-arr[1], v1.z-arr[2]} // inline vec3 SubP(const double *v) const
 #define NEG(v1)      {-v1.x, -v1.y, -v1.z} //inline vec3 operator- ( ) const
-#define DIVK(v1,k)  { v1.x/k, v1.y/k, v1.z/k} // inline vec3 operator/ (double S ) const // XXX need more efficient
+#define DIVK(v1,k)  {v1.x=v1.x/k; v1.y=v1.y/k; v1.z=v1.z/k;} // inline vec3 operator/ (double S ) const // XXX need more efficient
 #define DIV(v1,v2) { v1.x/v2.x, v1.y/v2.y, v1.z/v2.z}  // inline vec3 operator/ (const vec3& V2) const
 #define MUL(v1,v2) { v1.x*v2.x, v1.y*v2.y, v1.z*v2.z} // inline vec3 operator* (const vec3& V2) const
 #define MULK(v1,k)  { v1.x*k, v1.y*k, v1.z*k} // inline vec3 operator* (double S) const
-#define ADD(v1,k)  { v1.x+k, v1.y+k, v1.z+k} // inline vec3 operator+ (double S) const
+#define ADD(v1,k)  { v1.x=v1.x+k; v1.y=v1.y+k;  v1.z=v1.z+k;} // inline vec3 operator+ (double S) const
 #define SUBK(v1,k) { v1.x-k, v1.y-k, v1.z-k} 	// inline vec3 operator- (double S) const
 
 // MODIFIES FIRST VECTOR
@@ -39,10 +40,10 @@ typedef struct {
 #define MAGNITUDE(m,p) 	({ m=sqrt( p.x*p.x + p.y*p.y + p.z*p.z ); })
 #define MAGNITUDE_RET(p) 	(sqrt(p.x*p.x + p.y*p.y + p.z*p.z))
 #define NORMALIZE(p) {					\
-    double fMag = ( p.x*p.x + p.y*p.y + p.z*p.z );	\
+    float fMag = ( p.x*p.x + p.y*p.y + p.z*p.z );	\
     if (fMag != 0)					\
       {							\
-	double fMult = 1.0/sqrt(fMag);			\
+	float fMult = 1.0/sqrt(fMag);			\
 	p.x *= fMult;					\
 	p.y *= fMult;					\
 	p.z *= fMult;					\
@@ -59,7 +60,7 @@ typedef struct {
 #define MAX(a,b)      ( ((a)>(b))? (a):(b))
 #define VEC(v,a,b,c) vec3 v= {a,b,c}
 #define CLAMP(d, min, max) { \
-	double t=(d < min ? min : d); \
+	float t=(d < min ? min : d); \
 	d=(t > max ? max : t);\
 }
 #define CLAMPVEC(v1, min, max) { \

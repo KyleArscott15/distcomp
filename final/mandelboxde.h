@@ -30,15 +30,15 @@
 
 #define COMPONENT_FOLD(x) { (x) = fabs(x) <= 1? (x) : copysign(2,(x))-(x); }
 
-static inline double MandelBoxDE(const vec3 &p0, const MandelBoxParams &params, double c1, double c2)
+static inline float MandelBoxDE(const vec3 &p0, const MandelBoxParams &params, float c1, float c2)
 {
   vec3 p = COPY(p0);
-  double rMin2   = SQR(params.rMin);
-  double rFixed2 = SQR(params.rFixed);
-  double escape  = SQR(params.escape_time);
-  double dfactor = 1; 
-  double r2      =-1;
-  const double rFixed2rMin2 = rFixed2/rMin2;
+  float rMin2   = SQR(params.rMin);
+  float rFixed2 = SQR(params.rFixed);
+  float escape  = SQR(params.escape_time);
+  float dfactor = 1; 
+  float r2      =-1;
+  const float rFixed2rMin2 = rFixed2/rMin2;
 
   int i = 0;
   while (i< params.num_iter && r2 < escape)
@@ -57,8 +57,8 @@ static inline double MandelBoxDE(const vec3 &p0, const MandelBoxParams &params, 
       else
       if ( r2<rFixed2) 
 	{
-	  const double t = (rFixed2/r2);
-          double inter = rFixed2/r2;
+	  const float t = (rFixed2/r2);
+          float inter = rFixed2/r2;
 	  p = MULK(p, inter);
 	  dfactor *= t;
 	}
@@ -70,7 +70,7 @@ static inline double MandelBoxDE(const vec3 &p0, const MandelBoxParams &params, 
       i++;
     }
   
-  double mag;
+  float mag;
   MAGNITUDE(mag, p);
   
   return  (mag - c1) / dfactor - c2;

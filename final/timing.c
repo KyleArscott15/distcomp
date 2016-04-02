@@ -26,7 +26,7 @@
 #endif
 #include <unistd.h>
 
-double getTime() {  
+float getTime() {  
 #if defined(_MSC_VER) || defined(__MINGW32__)
   return 0;
 #else         

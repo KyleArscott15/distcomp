@@ -29,11 +29,15 @@
 #include "vector3d.h"
 #include "3d.h"
 #include "getcolor.h"
+#include "math.h"
 
-extern double getTime();
-extern void   printProgress( double perc, double time );
+extern float getTime();
+extern void   printProgress( float perc, float time );
 
-extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, double eps, pixelData &pix_data, MandelBoxParams &mandelBox_params);
+extern float getTime();
+extern void   printProgress( float perc, float time );
+
+extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, float eps, pixelData &pix_data, MandelBoxParams &mandelBox_params);
 extern vec3 getColour(const pixelData &pixData, const RenderParams &render_params,
 		      const vec3 &from, const vec3  &direction);
 
@@ -41,7 +45,7 @@ extern void foo();
 
 void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, unsigned char* image, MandelBoxParams &mandelBox_params)
 {
-  const double eps = pow(10.0, renderer_params.detail); 
+  const float eps = pow(10.0, renderer_params.detail); 
   vec3 from;
   
   SET_POINT(from,camera_params.camPos)
@@ -49,7 +53,7 @@ void renderFractal(const CameraParams &camera_params, const RenderParams &render
   const int height = renderer_params.height;
   const int width  = renderer_params.width;
   int j;
-  //double time = getTime();
+  //float time = getTime();
   
 #pragma omp parallel for default(shared) schedule(dynamic) num_threads(4)
   for(j = 0; j < height; j++){
@@ -57,7 +61,7 @@ void renderFractal(const CameraParams &camera_params, const RenderParams &render
       for(i = 0; i <width; i++){
 	  pixelData pix_data;
   	  vec3 color;
-	  double farPoint[3];
+	  float farPoint[3];
 	  vec3 to;
 
 	  foo();
@@ -83,7 +87,7 @@ void renderFractal(const CameraParams &camera_params, const RenderParams &render
 	  image[k+1] = (unsigned char)(color.y * 255);
 	  image[k]   = (unsigned char)(color.z * 255);
 	} // inner for
-      //printProgress((j+1)/(double)height,getTime()-time);
+      //printProgress((j+1)/(float)height,getTime()-time);
     }//end of outer for
 
   printf("\n rendering done:\n");

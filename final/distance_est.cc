@@ -32,31 +32,31 @@
 
 //using namespace std;
 //extern MandelBoxParams mandelBox_params; // KA no global variables!
-extern double MandelBoxDE(const vec3 &pos, const MandelBoxParams &mPar, double c1, double c2);
-double MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &params);
+extern float MandelBoxDE(const vec3 &pos, const MandelBoxParams &mPar, float c1, float c2);
+float MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &params);
 
 //Distance Estimator Field Selector
-double DE(const vec3 &p, MandelBoxParams &mandelBox_params)
+float DE(const vec3 &p, MandelBoxParams &mandelBox_params)
 {	
 #ifdef BULB
-  double d = MandelBulbDistanceEstimator(p, mandelBox_params);
+  float d = MandelBulbDistanceEstimator(p, mandelBox_params);
 #else
-  double c1 = fabs(mandelBox_params.scale - 1.0);
-  double c2 = pow( fabs(mandelBox_params.scale), 1 - mandelBox_params.num_iter);
-  double d = MandelBoxDE(p, mandelBox_params, c1, c2);
+  float c1 = fabsf(mandelBox_params.scale - 1.0);
+  float c2 = powf( fabsf(mandelBox_params.scale), 1 - mandelBox_params.num_iter);
+  float d = MandelBoxDE(p, mandelBox_params, c1, c2);
 #endif
   return d;
 }
 
-double MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &params)
+float MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &params)
 {
   vec3 z = COPY(p0);
   
-  double dr = 1.0;
-  double r = 0.0;
+  float dr = 1.0;
+  float r = 0.0;
 
-  double Bailout = params.rMin;
-  double Power = params.rFixed;
+  float Bailout = params.rMin;
+  float Power = params.rFixed;
 
   for (int i=0; i < params.num_iter; i++) 
     {
@@ -64,11 +64,11 @@ double MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &params
 	  
       if(r > Bailout){ break; }
 
-      double theta = acos(z.z/r);
-      double phi   = atan2(z.y, z.x);
+      float theta = acos(z.z/r);
+      float phi   = atan2(z.y, z.x);
       dr = pow(r, Power - 1.0) * Power * dr + 1.0;
 
-      double zr = pow(r, Power);
+      float zr = pow(r, Power);
       theta     = theta * Power;
       phi       = phi * Power;
 

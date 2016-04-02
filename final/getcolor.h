@@ -28,8 +28,8 @@ using namespace std;
 
 //---lightning and colouring---------
 static vec3 CamLight = {1.0,1.0,1.0};
-static double CamLightW = 1.8;// 1.27536;
-static double CamLightMin = 0.3;// 0.48193;
+static float CamLightW = 1.8;// 1.27536;
+static float CamLightMin = 0.3;// 0.48193;
 //-----------------------------------
 static const vec3 baseColor = {1.0, 1.0, 1.0};
 static const vec3 backColor = {0.4, 0.4, 0.4};
@@ -42,7 +42,7 @@ static inline void foo(){
 static inline void lighting(const vec3 &n, const vec3 &color, const vec3 &pos, const vec3 &direction,  vec3 &outV)
 {
   vec3 nn = SUBK(n, 1);
-  double ambient = max(CamLightMin, DOTRET(nn, direction))*CamLightW;
+  float ambient = max(CamLightMin, DOTRET(nn, direction))*CamLightW;
   outV = MUL(CamLight, color);
   outV = MULK(outV, ambient); 
 }
@@ -62,8 +62,8 @@ static inline vec3 getColour(const pixelData &pixData, const RenderParams &rende
       if(render_params.colourType == 0 || render_params.colourType == 1)
 	{
 	  hitColor = MUL(hitColor, pixData.normal);
-	  hitColor = ADD(hitColor, 1.0);
-	  hitColor = DIVK(hitColor, 2.0);
+	  ADD(hitColor, 1.0);
+	  DIVK(hitColor, 2.0);
 	  hitColor = MULK(hitColor, render_params.brightness);
 	  	  
 	  //gamma correction
@@ -73,7 +73,7 @@ static inline vec3 getColour(const pixelData &pixData, const RenderParams &rende
       if(render_params.colourType == 1)
 	{
 	  //"swap" colors
-	  double t = hitColor.x;
+	  float t = hitColor.x;
 	  hitColor.x = hitColor.z;
 	  hitColor.z = t;
 	}
