@@ -1,0 +1,8 @@
+
+
+params.dat   14.1 seconds
+params1.dat  6.3-4 seconds
+params2.dat  1.46 seconds 
+params3.dat  9.93 seconds
+params4.dat  10.7 seconds
+params5.dat  34.3 seconds   # why does this make 0?

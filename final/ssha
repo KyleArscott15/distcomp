@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh -i ~/.ssh/Kyle-key-pair-oregon.pem  ec2-user@52.34.230.166
