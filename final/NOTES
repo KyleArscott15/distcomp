@@ -1,4 +1,3 @@
-
 # ALL FILES from kyle to amazon
 scp -i ~/.ssh/Kyle-key-pair-oregon.pem `find . -maxdepth 1 -type f` ec2-user@ec2-52-34-230-166.us-west-2.compute.amazonaws.com:~
 
@@ -12,3 +11,13 @@ params2.dat  1.46 seconds
 params3.dat  9.93 seconds
 params4.dat  10.7 seconds
 params5.dat  34.3 seconds   # why does this make 0?
+
+3d.cc:#pragma acc routine seq
+getcolor.cc:#pragma acc routine seq
+raymarching.cc:#pragma acc routine seq
+renderer.cc:#pragma acc routine seq
+renderer.cc:#pragma acc routine seq
+renderer.cc:#pragma acc routine seq
+renderer.cc:#pragma acc data copyout(image[0:3*n]) create(to[0:n],pix[0:n],col[0:n]) copyin(eps,from,renderer_params,mandelBox_params,camera_params)
+renderer.cc:#pragma acc parallel loop
+renderer.cc:#pragma acc loop

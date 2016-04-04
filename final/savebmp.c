@@ -22,10 +22,15 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <strings.h>
+
+#define SAVEDIR "images/"
 
 void saveBMP(const char* filename, const unsigned char* result, int w, int h){
 
 	FILE *f;
+	char fullPath[128];
+	bzero(fullPath, 128);
 	unsigned char *img = NULL;
 	int filesize = 54 + 3*w*h;  //w is your image width, h is image height, both int
 
@@ -47,7 +52,8 @@ void saveBMP(const char* filename, const unsigned char* result, int w, int h){
 	bmpinfoheader[10] = (unsigned char)(       h>>16);
 	bmpinfoheader[11] = (unsigned char)(       h>>24);
 
-	f = fopen(filename,"wb");
+	sprintf(fullPath, "%s%s", SAVEDIR, filename);
+	f = fopen(fullPath,"wb");
 	fwrite(bmpfileheader,1,14,f);
 	fwrite(bmpinfoheader,1,40,f);
 
