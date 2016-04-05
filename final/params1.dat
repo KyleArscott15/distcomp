@@ -1,12 +1,12 @@
 # CAMERA
 # location  x,y,z   (7,7,7)
-7 1 7 
+2.400000 0.330000 2.100000
 # look_at (target)  x,y,z
-0 1 0 
+0 0 0
 # up vector x,y,z;  (0, 1, 0)
 0 1 0
 # field of view     (1)
-1.1  
+1.3
 # IMAGE
 # width height
 #3840 2160
@@ -24,6 +24,6 @@
 # brightness
 1.2
 # super sampling anti aliasing 0 = off, 1 = on
-0
+frames/image
 # IMAGE FILE NAME
 image.bmp

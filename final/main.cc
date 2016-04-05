@@ -17,36 +17,93 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 #include <stdlib.h>
 #include <stdio.h>
 #include "camera.h"
 #include "renderer.h"
 #include "mandelbox.h"
 
-void getParameters(char *filename, CameraParams *camera_params, RenderParams *renderer_params, MandelBoxParams *mandelBox_params);
-void init3D       (CameraParams *camera_params, const RenderParams *renderer_params);
-void renderFractal(const CameraParams &camera_params, const RenderParams &renderer_params, unsigned char* image, MandelBoxParams &mandelBox_params);
-void saveBMP      (const char* filename, const unsigned char* image, int width, int height);
+void getParameters(char            *filename,
+                   float           *camera_position_array,
+                   float           *camera_position_changes_array,
+                   float           *camera_angle_array,
+                   float           *camera_angle_changes_array,
+                   int              frame_no,
+                   CameraParams    *camera_params,
+                   RenderParams    *renderer_params,
+                   MandelBoxParams *mandelBox_params);
+void init3D(CameraParams       *camera_params,
+            const RenderParams *renderer_params);
+int  renderFractal(const CameraParams& camera_params,
+                   float              *camera_position_array,
+                   float              *camera_position_changes_array,
+                   int                 move_position,
+                   float              *camera_angle_array,
+                   float              *camera_angle_changes_array,
+                   int                 frame_no,
+                   const RenderParams& renderer_params,
+                   unsigned char      *image,
+                   MandelBoxParams   & mandelBox_params);
 
-int main(int argc, char** argv)
+void saveBMP(const char          *filename,
+             int                  frame_no,
+             const unsigned char *image,
+             int                  width,
+             int                  height);
+
+int main(int argc, char **argv)
 {
   MandelBoxParams mandelBox_params;
   CameraParams    camera_params;
   RenderParams    renderer_params;
-  
-  getParameters(argv[1], &camera_params, &renderer_params, &mandelBox_params);
+  float camera_position_array[3];
+  float camera_position_changes_array[3] = { 0, 0, 0 };
+  float camera_angle_array[3];
+  float camera_angle_changes_array[3] = { 0, 0, 0 };
+  int   frame_counter                 = 0;
+  int   move_position                 = 1;
 
-  int image_size = renderer_params.width * renderer_params.height;
-  unsigned char *image = (unsigned char*)malloc(3*image_size*sizeof(unsigned char));
+  // int clear_position_changes;
+  while (frame_counter < 2){//7200) {
+    getParameters(argv[1],
+                  camera_position_array,
+                  camera_position_changes_array,
+                  camera_angle_array,
+                  camera_angle_changes_array,
+                  frame_counter,
+                  &camera_params,
+                  &renderer_params,
+                  &mandelBox_params);
 
-  init3D(&camera_params, &renderer_params);
+    // printf("%f\n", camera_position_array[0]);
+    int image_size       = renderer_params.width * renderer_params.height;
+    unsigned char *image =
+      (unsigned char *)malloc(3 * image_size * sizeof(unsigned char));
 
-  renderFractal(camera_params, renderer_params, image, mandelBox_params);
-  
-  saveBMP(renderer_params.file_name, image, renderer_params.width, renderer_params.height);
-  
-  free(image);
+    init3D(&camera_params, &renderer_params);
 
+
+    move_position = renderFractal(camera_params,
+                                  camera_position_array,
+                                  camera_position_changes_array,
+                                  move_position,
+                                  camera_angle_array,
+                                  camera_angle_changes_array,
+                                  frame_counter,
+                                  renderer_params,
+                                  image,
+                                  mandelBox_params);
+
+    saveBMP(renderer_params.file_name,
+            frame_counter,
+            image,
+            renderer_params.width,
+            renderer_params.height);
+
+    free(image);
+    frame_counter++;
+  }
   return 0;
 }
+

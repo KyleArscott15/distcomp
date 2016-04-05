@@ -1,6 +1,6 @@
 
 CC       =  g++
-FLAGS    = -O3 -Wall -std=gnu++0x -fopenmp -g -pg #-E
+FLAGS    = -O3 -Wall -std=gnu++0x -fopenmp -g -pg #-E # -acc -fast -tesla,cc35 -Minfo=accel -Minform=inform 
 CFLAGS   = $(FLAGS)
 CXXFLAGS = $(FLAGS)
 LDFLAGS  = -lm -L.

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+CONFIG=./cpp.cfg
+
+# only cleans up source code in the current directory, ie. not recursive
+for file in `ls *.cpp *.cc *.c *.h *.hpp`
+do
+	uncrustify -c $CONFIG -f ${file} -o ${file}
+done
+
+rm -f *unc-backup*

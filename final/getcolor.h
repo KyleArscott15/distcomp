@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 #include "color.h"
 #include "renderer.h"
 #include "vector3d.h"
@@ -26,61 +26,71 @@
 
 using namespace std;
 
-//---lightning and colouring---------
-static vec3 CamLight = {1.0,1.0,1.0};
-static float CamLightW = 1.8;// 1.27536;
-static float CamLightMin = 0.3;// 0.48193;
-//-----------------------------------
-static const vec3 baseColor = {1.0, 1.0, 1.0};
-static const vec3 backColor = {0.4, 0.4, 0.4};
-//-----------------------------------
+// ---lightning and colouring---------
+static vec3  CamLight = { 1.0, 1.0, 1.0 };
+static float CamLightW   = 1.8; // 1.27536;
+static float CamLightMin = 0.3; // 0.48193;
+// -----------------------------------
+static const vec3 baseColor = { 1.0, 1.0, 1.0 };
+static const vec3 backColor = { 0.4, 0.4, 0.4 };
 
-static inline void foo(){
-	//printf("HI\n");
+// -----------------------------------
+
+static inline void foo() {
+  // printf("HI\n");
 }
 
-static inline void lighting(const vec3 &n, const vec3 &color, const vec3 &pos, const vec3 &direction,  vec3 &outV)
+static inline void lighting(const vec3& n,
+                            const vec3& color,
+                            const vec3& pos,
+                            const vec3& direction,
+                            vec3      & outV)
 {
-  vec3 nn = SUBK(n, 1);
-  float ambient = max(CamLightMin, DOTRET(nn, direction))*CamLightW;
+  vec3  nn      = SUBK(n, 1);
+  float ambient = max(CamLightMin, DOTRET(nn, direction)) * CamLightW;
+
   outV = MUL(CamLight, color);
-  outV = MULK(outV, ambient); 
+  outV = MULK(outV, ambient);
 }
 
-static inline vec3 getColour(const pixelData &pixData, const RenderParams &render_params,
-	       const vec3 &from, const vec3  &direction)
+static inline vec3 getColour(const pixelData   & pixData,
+                             const RenderParams& render_params,
+                             const vec3        & from,
+                             const vec3        & direction)
 {
-  //colouring and lightning
+  // colouring and lightning
   vec3 hitColor = COPY(baseColor);
-  
-  if (pixData.escaped == false) 
+
+  if (pixData.escaped == false)
+  {
+    // apply lighting
+    lighting(pixData.normal, hitColor, pixData.hit, direction, hitColor);
+
+    // add normal based colouring
+    if ((render_params.colourType == 0) || (render_params.colourType == 1))
     {
-      //apply lighting
-      lighting(pixData.normal, hitColor, pixData.hit, direction, hitColor);
-      
-      //add normal based colouring
-      if(render_params.colourType == 0 || render_params.colourType == 1)
-	{
-	  hitColor = MUL(hitColor, pixData.normal);
-	  ADD(hitColor, 1.0);
-	  DIVK(hitColor, 2.0);
-	  hitColor = MULK(hitColor, render_params.brightness);
-	  	  
-	  //gamma correction
-	  CLAMPVEC(hitColor, 0.0, 1.0);
-	  hitColor = MUL(hitColor, hitColor);
-	}
-      if(render_params.colourType == 1)
-	{
-	  //"swap" colors
-	  float t = hitColor.x;
-	  hitColor.x = hitColor.z;
-	  hitColor.z = t;
-	}
+      hitColor = MUL(hitColor, pixData.normal);
+      ADD(hitColor, 1.0);
+      DIVK(hitColor, 2.0);
+      hitColor = MULK(hitColor, render_params.brightness);
+
+      // gamma correction
+      CLAMPVEC(hitColor, 0.0, 1.0);
+      hitColor = MUL(hitColor, hitColor);
     }
-  else 
-    //we have the background colour
+
+    if (render_params.colourType == 1)
+    {
+      // "swap" colors
+      float t = hitColor.x;
+      hitColor.x = hitColor.z;
+      hitColor.z = t;
+    }
+  }
+  else
+    // we have the background colour
     hitColor = COPY(backColor);
-  
+
   return hitColor;
 }
+
