@@ -47,13 +47,13 @@ typedef struct {
 #define MAGNITUDE(m,p) 	({ m=sqrtf( p.x*p.x + p.y*p.y + p.z*p.z ); })
 #define MAGNITUDE_RET(p) 	(sqrtf(p.x*p.x + p.y*p.y + p.z*p.z))
 #define NORMALIZE(p) {					\
-    float fMag = ( p.x*p.x + p.y*p.y + p.z*p.z );	\
+    float fMag = ( (p).x*(p).x + (p).y*(p).y + (p).z*(p).z );	\
     if (fMag != 0)					\
       {							\
 	float fMult = 1.0/sqrtf(fMag);			\
-	p.x *= fMult;					\
-	p.y *= fMult;					\
-	p.z *= fMult;					\
+	(p).x *= fMult;					\
+	(p).y *= fMult;					\
+	(p).z *= fMult;					\
       }							\
   }
 #define VECESUBDUBDUB(v,d1,d2)  v.x = (d1[i*3]-d2[0]); v.y = (d1[i*3 + 1]-d2[1]); v.z = (d1[i * 3 + 2]-d2[2]);// inline vec3 SubtractDoubleDouble(const double *d1, const double *d2) 

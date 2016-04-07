@@ -43,38 +43,24 @@ extern float getTime();
 extern void   printProgress( float perc, float time );
 
 #pragma acc routine seq
-extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, float eps, pixelData &pix_data, MandelBoxParams &mandelBox_params);
+extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, float eps, pixelData &pix_data, const MandelBoxParams &mandelBox_params);
 
-void renderFractal(const CameraParams camera_params, const RenderParams renderer_params, unsigned char* image, MandelBoxParams mandelBox_params)
+void renderFractal(const CameraParams camera_params, 
+  const RenderParams &renderer_params, 
+  unsigned char* image, 
+  const MandelBoxParams &mandelBox_params, float *farPoint, vec3 *to, pixelData *pix, vec3* col, const int width, const int height, 
+  const int area, const float eps)
 {
-  const float eps = pow((float)10.0, renderer_params.detail); 
   vec3 from;
-  
   SET_POINT(from,camera_params.camPos)
   
-  const int height = renderer_params.height;
-  const int width  = renderer_params.width;
-  const int area   = width * height;
-
-  float *farPoint = (float*) malloc(sizeof(float)*3*area);
-  vec3 *to = (vec3*) malloc(sizeof(vec3) * area);
-  pixelData *pix = (pixelData*) malloc(sizeof(pixelData) * area);
-  vec3* col = (vec3*) malloc(sizeof(vec3) * area);
-
-//#pragma omp parallel for
-  /*
-  for (int i = 1; i<area; i++){
-    UnProject(i%width, i/width, camera_params, &farPoint[i*3]);
-  }
-  */
-  
-#pragma acc data copyout(image[0:3*area]) create(to[0:area],pix[0:area],col[0:area]) pcopyin(eps,from,renderer_params,mandelBox_params,camera_params)
+#pragma acc data copyout(image[0:3*area]) create(to[0:area],pix[0:area],col[0:area]) copyin(eps,from,camera_params) present(renderer_params,mandelBox_params)//,eps)
 {
 #pragma acc parallel loop //#pragma acc kernels
 {
 #pragma acc loop independent //#pragma acc for independent
   for(int i = 0; i < area; i++){
-    UnProject(i%width, i/width, camera_params, &farPoint[i*3]); // XXX KA 
+	  UnProject(i%width, i/width, camera_params, farPoint+i*3);//&farPoint[i*3]); // XXX KA 
     
 	  VECESUBDUBDUB(to[i],farPoint,camera_params.camPos);
 	  NORMALIZE(to[i]);
@@ -82,7 +68,6 @@ void renderFractal(const CameraParams camera_params, const RenderParams renderer
 	  getColour(pix[i], renderer_params, from, to[i], &col[i]);
 
 	  //save colour into texture
-	  //int k = (j * width + i)*3;
 	  image[i*3+2] = (unsigned char)(col[i].x * 255);
 	  image[i*3+1] = (unsigned char)(col[i].y * 255);
 	  image[i*3]   = (unsigned char)(col[i].z * 255);
@@ -91,5 +76,6 @@ void renderFractal(const CameraParams camera_params, const RenderParams renderer
     //}//end of outer for
 }
 }
+
   printf("\n rendering done:\n");
 }

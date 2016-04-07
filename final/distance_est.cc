@@ -124,7 +124,7 @@ inline float MandelBulbDistanceEstimator(const vec3 &p0, const MandelBoxParams &
 
 
 //#pragma acc routine seq
-inline float DE(const vec3 &p, MandelBoxParams &mandelBox_params)
+inline float DE(const vec3 &p, const MandelBoxParams &mandelBox_params)
 {	
 #ifdef BULB
   float d = MandelBulbDistanceEstimator(p, mandelBox_params);

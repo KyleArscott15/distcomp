@@ -23,10 +23,20 @@
 #include "camera.h"
 #include "renderer.h"
 #include "mandelbox.h"
+#include <strings.h>//bzero
+#include <math.h>
+#include "vector3d.h"
+    #include "color.h"
+
+//ifdef _OPENACC
+#include <openacc.h>
+//#endif
 
 void getParameters(char *filename, CameraParams *camera_params, RenderParams *renderer_params, MandelBoxParams *mandelBox_params);
 void init3D       (CameraParams *camera_params, const RenderParams *renderer_params);
-void renderFractal(const CameraParams camera_params, const RenderParams renderer_params, unsigned char* image, MandelBoxParams mandelBox_params);
+void renderFractal(const CameraParams camera_params, const RenderParams &renderer_params, 
+unsigned char* image, const MandelBoxParams &mandelBox_params, float *farPoint, vec3 *to, pixelData *pix, vec3* col, 
+const int width, const int height, const int area, const float eps);//, const float &eps);
 void saveBMP      (const char* filename, const unsigned char* image, int width, int height);
 
 int main(int argc, char** argv)
@@ -38,16 +48,37 @@ int main(int argc, char** argv)
   getParameters(argv[1], &camera_params, &renderer_params, &mandelBox_params);
 
   int image_size = renderer_params.width * renderer_params.height;
-  unsigned char *image = (unsigned char*)malloc(3*image_size*sizeof(unsigned char));
+  int image_memory = 3*image_size*sizeof(unsigned char);
+  unsigned char *image = (unsigned char*)malloc(image_memory);
 
-  init3D(&camera_params, &renderer_params);
+  const float eps = pow((float)10.0, renderer_params.detail); 
+  const int height = renderer_params.height;
+  const int width  = renderer_params.width;
+  const int area   = width * height;
+
+  float *farPoint = (float*) malloc(sizeof(float)*3*area);
+  vec3 *to = (vec3*) malloc(sizeof(vec3) * area);
+  pixelData *pix = (pixelData*) malloc(sizeof(pixelData) * area);
+  vec3* col = (vec3*) malloc(sizeof(vec3) * area);
+
+  char name[64];
+  bzero(name,64);
 
   int x=0;
-  for(;x<2;x++){
-    renderFractal(camera_params, renderer_params, image, mandelBox_params);
-    saveBMP(renderer_params.file_name, image, renderer_params.width, renderer_params.height);
+
+  #pragma acc data copyin(renderer_params, mandelBox_params)
+  {
+    for(;x<2;x++){
+      init3D(&camera_params, &renderer_params);
+      renderFractal(camera_params, renderer_params, image, mandelBox_params, farPoint, to, pix, col, width, height, area, eps);
+      sprintf(name, "image-%05d.bmp", x);
+      saveBMP(name, image, renderer_params.width, renderer_params.height); //renderer_params.file_name
+      camera_params.camPos[0] = -7; // DONT DO +=
+      camera_params.camPos[1] = 0; // DONT DO +=
+      camera_params.camPos[2] = 0; // DONT DO +=
+      //bzero(image, image_memory); // doesn't make next image work
+    }
   }
-  
   free(image);
 
   return 0;

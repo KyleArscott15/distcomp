@@ -46,7 +46,7 @@ inline void Normalize(vec3 &p) {
       }							
   }
 
-inline void normal(const vec3 &p, vec3 &normal, MandelBoxParams &mandelBox_params)
+inline void normal(const vec3 &p, vec3 &normal, const MandelBoxParams &mandelBox_params)
 {
   // compute the normal at p
   const float sqrt_mach_eps = 3.4527e-04;// 1.4901e-08;
@@ -72,7 +72,7 @@ inline void normal(const vec3 &p, vec3 &normal, MandelBoxParams &mandelBox_param
 }
 
 #pragma acc routine seq
-void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, float eps, pixelData& pix_data, MandelBoxParams &mandelBox_params)
+void rayMarch(const RenderParams &render_params, const vec3 &from, const vec3  &direction, float eps, pixelData& pix_data, const MandelBoxParams &mandelBox_params)
 {
   float dist = 0.0;
   float totalDist = 0.0;

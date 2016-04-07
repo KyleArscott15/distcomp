@@ -26,14 +26,8 @@
 
 using namespace std;
 
-/*/---lightning and colouring---------
-static vec3 CamLight = {1.0,1.0,1.0};
-static double CamLightW = 1.8;// 1.27536;
-static double CamLightMin = 0.3;// 0.48193;
-//-----------------------------------
-static const vec3 baseColor = {1.0, 1.0, 1.0};
-static const vec3 backColor = {0.4, 0.4, 0.4};
-//-----------------------------------*/
+#ifndef GETCOL
+#define GETCOL
 
 #define MAXB(a, b)	(a<b)?b:a
 
@@ -104,3 +98,5 @@ void getColour(const pixelData &pixData, const RenderParams &render_params,
   outp->x = hitColor.x; outp->y = hitColor.y; outp->z = hitColor.z;
   //return hitColor;
 }
+
+#endif

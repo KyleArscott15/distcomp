@@ -19,7 +19,7 @@ done
 # ffmpeg -loop 1 -i $INTRO_IMG -t 5 $INTRO_FILE
 
 # make video from the images
-ffmpeg -r $FPS -i images/image-%03d.bmp.jpg -b 5000k -s $RES $FINAL_FILE
+fmpeg -r $FPS -i images/image-%05d.jpg -b 5000k -s $RES $FINAL_FILE
 
 # combine intro + main video
 

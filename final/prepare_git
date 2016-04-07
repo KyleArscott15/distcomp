@@ -1,7 +1,7 @@
 #!/bin/bash
 make clean
-rm gmon.out
 rm images/*
+rm gmon.out
 rm *.bmp
 rm *.png
 rm *.jpg

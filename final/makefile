@@ -7,10 +7,10 @@ CFLAGS   = $(FLAGS)
 CXXFLAGS = $(FLAGS)
 LDFLAGS  = -lm -L.
 
-ifeq ($(MAKECMDGOALS),)
-else
+ifeq ($(MAKECMDGOALS),mandelbulb)
 	CFLAGS+=-DBULB
 	CXXFLAGS+=-DBULB
+else
 endif
 
 PROGRAM_NAME=mandelbox
@@ -29,10 +29,10 @@ acc: main.o print.o timing.o savebmp.o getparams.o 3d.o getcolor.o distance_est.
 	mandelboxde.o raymarching.o renderer.o init3D.o
 	$(CC) -o $@ $? $(ACCFLAGS) $(LDFLAGS)
 
-video: mandelbulb 
+video: $(PROGRAM_NAME) 
 	@mkdir -p images
-	@rm -f images/{*.bmp*,*.mp4}
-	@./mandelbulb paramsBulb.dat
+	@rm -f images/{*.bmp*,*.jpg*,*.mp4}
+	@./mandelbox params.dat
 	@./video.sh
 
 clean:
