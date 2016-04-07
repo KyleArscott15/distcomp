@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #ifndef MANDELBOX_H
 #define MANDELBOX_H
 
@@ -26,7 +26,7 @@ typedef struct {
   float rMin, rFixed;
   float scale;
   float escape_time;
-  int   num_iter;
+  int num_iter;
 } MandelBoxParams;
 
-#endif // ifndef MANDELBOX_H
+#endif

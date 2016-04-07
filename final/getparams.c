@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,158 +27,94 @@
 
 #define BUF_SIZE 1024
 
-
-void getParameters(char            *filename,
-                   float           *camera_position_array,
-                   float           *camera_position_changes_array,
-                   float           *camera_angle_array,
-                   float           *camera_angle_changes_array,
-                   int              frame_no,
-                   CameraParams    *camP,
-                   RenderParams    *renP,
-                   MandelBoxParams *boxP)
+void getParameters(char *filename, CameraParams *camP, RenderParams *renP, MandelBoxParams *boxP)
 {
-  FILE  *fp;
-  int    ret;
+  FILE *fp;
+  int ret;
   float *d;
-  char   buf[BUF_SIZE];
-
+  char buf[BUF_SIZE];
+  
   renP->fractalType = 0;
   renP->maxRaySteps = 8000;
   renP->maxDistance = 1000;
 
-  fp = fopen(filename, "r");
-
-  if (!fp)
-  {
-    printf(" *** File %s does not exist\n", filename);
-    exit(1);
-  }
-
-  int count = 0;
-
-  while (1)
-  {
-    memset(buf, 0, BUF_SIZE);
-
-    ret = fscanf(fp, "%1023[^\n]\n", buf);
-
-    if (ret == EOF) break;
-
-    if (buf[0] == '#') // comment line
-      continue;
-
-    switch (count)
+  fp = fopen(filename,"r");
+  
+  if( !fp ) 
     {
-    // CAMERA
-    // camera position
-    case 0:
-      d = camP->camPos;
-
-      if (frame_no == 0) {
-        sscanf(buf, "%f %f %f", d, d + 1, d + 2);
-        camera_position_array[0] = *d;
-        camera_position_array[1] = *(d + 1);
-        camera_position_array[2] = *(d + 2);
-      }
-      else {
-        // camera_position_array[0] = camera_position_array[0] +
-        // camera_position_changes_array[0];
-        // camera_position_array[1] = camera_position_array[1] +
-        // camera_position_changes_array[1];
-        // camera_position_array[2] = camera_position_array[2] +
-        // camera_position_changes_array[2];
-        *d       = camera_position_array[0];
-        *(d + 1) = camera_position_array[1];
-        *(d + 2) = camera_position_array[2];
-
-        // printf("step_x: %f\t step_y: %f\t step_z: %f\n",
-        // camera_position_changes_array[0]
-        //      , camera_position_changes_array[1] ,
-        // camera_position_changes_array[2]);
-        printf("camPos: %f %f %f\n", *d, *(d + 1), *(d + 2));
-      }
-
-      break;
-
-    case 1:
-
-      // camera target
-      d = camP->camTarget;
-
-      if (frame_no == 0) {
-        sscanf(buf, "%f %f %f", d, d + 1, d + 2);
-        camera_angle_array[0] = *d;
-        camera_angle_array[1] = *(d + 1);
-        camera_angle_array[2] = *(d + 2);
-      }
-      else
-      {
-        // camera_angle_array[0] = camera_angle_array[0] +
-        // camera_angle_changes_array[0];
-        // camera_angle_array[1] = camera_angle_array[1] +
-        // camera_angle_changes_array[1];
-        // camera_angle_array[2] = camera_angle_array[2] +
-        // camera_angle_changes_array[2];
-        *d       = camera_angle_array[0];
-        *(d + 1) = camera_angle_array[1];
-        *(d + 2) = camera_angle_array[2];
-
-        // printf("Ang_step_x: %f\t Ang_step_y: %f\t Ang_step_z: %f\n",
-        // camera_angle_changes_array[0]
-        //      , camera_angle_changes_array[1] ,
-        // camera_angle_changes_array[2]);
-        printf("camAng: %f %f %f\n", *d, *(d + 1), *(d + 2));
-      }
-      break;
-
-    // camera up
-    case 2:
-      d = camP->camUp;
-      sscanf(buf, "%f %f %f", d, d + 1, d + 2);
-      break;
-
-    // field of view
-    case 3:
-      sscanf(buf, "%f", &camP->fov);
-      break;
-
-    // IMAGE
-    // width, height
-    case 4:
-      sscanf(buf, "%d %d", &renP->width, &renP->height);
-      break;
-
-    // detail
-    case 5:
-      sscanf(buf, "%f", &renP->detail);
-      break;
-
-    // FRACTAL
-    case 6:
-      sscanf(buf, "%f %f %f", &boxP->scale, &boxP->rMin, &boxP->rFixed);
-      break;
-
-    case 7:
-      sscanf(buf, "%d %f ", &boxP->num_iter, &boxP->escape_time);
-      break;
-
-    // COLORING
-    case 8:
-      sscanf(buf, "%d", &renP->colourType);
-      break;
-
-    case 9:
-      sscanf(buf, "%f ", &renP->brightness);
-      break;
-
-    // FILENAME
-    case 10:
-      strcpy(renP->file_name, buf);
-      break;
+      printf(" *** File %s does not exist\n", filename);
+      exit(1);
     }
-    count++;
-  }
+  
+  int count = 0;
+  
+  while (1)
+    {
+      memset(buf, 0, BUF_SIZE);
+      
+      ret = fscanf(fp, "%1023[^\n]\n", buf);
+      if (ret == EOF) break;
+      
+      if(buf[0] == '#') // comment line
+	continue;
+      
+      switch(count)
+	{
+	  // CAMERA
+	  //camera position
+	case 0:
+	  d = camP->camPos;
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
+	  break;
+	case 1:
+	  //camera target
+	  d = camP->camTarget;
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
+	  break;
+	  //camera up 
+	case 2:
+	  d = camP->camUp;
+	  sscanf(buf, "%f %f %f", d, d+1, d+2);
+	  break;
+	  //field of view
+	case 3:
+	  sscanf(buf, "%f", &camP->fov);
+	  break;
+	  
+	  //IMAGE
+	  //width, height
+	case 4:
+	  sscanf(buf, "%d %d", &renP->width, &renP->height);
+	  break;
+	  //detail
+	case 5:
+	  sscanf(buf, "%f", &renP->detail);
+	  break;
+	  
+	  //FRACTAL
+	case 6:
+	  sscanf(buf, "%f %f %f", &boxP->scale, &boxP->rMin, &boxP->rFixed);
+ 	  break;
+	  
+	case 7:
+	  sscanf(buf, "%d %f ", &boxP->num_iter, &boxP->escape_time);
+	  break;
+	  
+	  //COLORING 
+	case 8:
+	  sscanf(buf, "%d", &renP->colourType);
+	  break;
+	case 9:
+	  sscanf(buf, "%f ", &renP->brightness);
+	  break;
+	  //FILENAME
+	case 10:
+	  strcpy(renP->file_name, buf);
+	  //printf(" *** File %s does not exist\n", buf);
+	  break;
+	}
+      count++;
+    }
   fclose(fp);
 }
 

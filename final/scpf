@@ -1,2 +1,2 @@
 #!/bin/bash
-scp -i ~/.ssh/Kyle-key-pair-oregon.pem ec2-user@ec2-52-36-82-20.us-west-2.compute.amazonaws.com:~/$1 .
+scp -i ~/.ssh/Kyle-key-pair-oregon.pem ec2-user@ec2-52-34-230-166.us-west-2.compute.amazonaws.com:~/$1 .

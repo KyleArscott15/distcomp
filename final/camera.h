@@ -17,11 +17,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #ifndef _CAMERA_H
 #define _CAMERA_H
 
-typedef struct
+typedef struct 
 {
   float camPos[3];
   float camTarget[3];
@@ -29,8 +29,8 @@ typedef struct
   float fov;
   float matModelView[16];
   float matProjection[16];
-  float matInvProjModel[16];
-  int   viewport[4];
+  float matInvProjModel[16]; 
+  int    viewport[4];
 } CameraParams;
 
-#endif // ifndef _CAMERA_H
+#endif

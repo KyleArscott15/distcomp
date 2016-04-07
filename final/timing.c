@@ -17,26 +17,23 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #include <stdio.h>
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #else
-# include <sys/resource.h>
-#endif /* if defined(_MSC_VER) || defined(__MINGW32__) */
+#include <sys/resource.h>
+#endif
 #include <unistd.h>
 
-float getTime() {
+float getTime() {  
 #if defined(_MSC_VER) || defined(__MINGW32__)
   return 0;
-
-#else /* if defined(_MSC_VER) || defined(__MINGW32__) */
+#else         
   struct rusage usage;
   getrusage(RUSAGE_SELF, &usage);
   struct timeval time;
   time = usage.ru_utime;
-  return time.tv_sec + time.tv_usec / 1e6;
-
-#endif /* if defined(_MSC_VER) || defined(__MINGW32__) */
+  return time.tv_sec+time.tv_usec/1e6;
+#endif
 }
-

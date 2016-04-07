@@ -17,23 +17,23 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 #ifndef _RENMandelBoxDERER_H
 #define _RENMandelBoxDERER_H
 
-typedef struct
+typedef struct 
 {
-  int   fractalType;
-  int   colourType;
-  int   super_sampling;
+  int fractalType;
+  int colourType;
+  int super_sampling;
   float brightness;
-  int   width;
-  int   height;
+  int width;
+  int height;
   float detail;
-  int   maxRaySteps;
+  int maxRaySteps;
   float maxDistance;
-  char  file_name[80];
+  char file_name[80];
 } RenderParams;
 
-#endif // ifndef _RENMandelBoxDERER_H
+#endif

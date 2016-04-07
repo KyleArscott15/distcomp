@@ -17,30 +17,27 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-void printProgress(float perc, float time)
+void printProgress( float perc, float time )
 {
-  static char  delete_space[80];
-  static char *OutputString;
-
+  static char delete_space[80];
+  static char * OutputString;
   perc *= 100;
 
   int sec = ceil(time);
-  int hr  = sec / 3600;
-  int t   = sec % 3600;
-  int min = t / 60;
-  sec = t % 60;
-
-  OutputString =
-    (char *)"*** completed % 5.2f%s ---  cum. time = %02d:%02d:%02d   % e (s)";
+  int hr = sec/3600;
+  int t = sec%3600;
+  int min = t/60;
+  sec = t%60;
+  
+  OutputString = (char*)"*** completed % 5.2f%s ---  cum. time = %02d:%02d:%02d   % e (s)";
   sprintf(delete_space, OutputString, perc, "%%", hr, min, sec, time);
 
   fprintf(stderr, "%s", delete_space);
-
-  for (unsigned int i = 0; i < strlen(delete_space); i++) fputc(8, stderr);
+  for ( unsigned int i = 0; i < strlen(delete_space); i++)
+    fputc( 8, stderr);
 }
-

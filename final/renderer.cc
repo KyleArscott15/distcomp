@@ -17,11 +17,17 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "omp.h"
+
+#ifdef _OPENACC
+#include <openacc.h>
+#endif
+
+//#include <iostream>
 
 #include "color.h"
 #include "mandelbox.h"
@@ -29,253 +35,125 @@
 #include "vector3d.h"
 #include "3d.h"
 #include "getcolor.h"
-#include "math.h"
-#include <time.h>
+
+
+
+//#pragma acc routine seq
+extern int UnProject(float winX, float winY, CameraParams camP, float *obj);
 
 extern float getTime();
-extern void  printProgress(float perc,
-                           float time);
+extern void   printProgress( float perc, float time );
 
-extern float getTime();
-extern void  printProgress(float perc,
-                           float time);
+#pragma acc routine seq
+extern void rayMarch (const RenderParams &render_params, const vec3 &from, const vec3  &to, float eps, pixelData &pix_data, MandelBoxParams &mandelBox_params);
 
-extern float rayMarch(const RenderParams& render_params,
-                      const vec3        & from,
-                      const vec3        & to,
-                      float               eps,
-                      pixelData         & pix_data,
-                      MandelBoxParams   & mandelBox_params);
+//#pragma acc routine seq
+//extern void getColour(const pixelData &pixData, const RenderParams &render_params,
+//		      const vec3 &from, const vec3  &direction, vec3 *color);
 
-extern vec3 getColour(const pixelData   & pixData,
-                      const RenderParams& render_params,
-                      const vec3        & from,
-                      const vec3        & direction);
+//extern void foo();
 
-int renderFractal(const CameraParams& camera_params,
-                  float              *camera_position_array,
-                  float              *camera_position_changes_array,
-                  int                 move_position,
-                  float              *camera_angle_array,
-                  float              *camera_angle_changes_array,
-                  int                 frame_no,
-                  const RenderParams& renderer_params,
-                  unsigned char      *image,
-                  MandelBoxParams   & mandelBox_params)
+void renderFractal(const CameraParams camera_params, const RenderParams renderer_params, unsigned char* image, MandelBoxParams mandelBox_params)
 {
-  const float eps = pow(10.0, renderer_params.detail);
+
+
+
+//#pragma acc data copyout(image[0:3*n]) create(to[0:n],pix[0:n],col[0:n]) copyin(eps,from,renderer_params,mandelBox_params,camera_params)
+
+
+  const float eps = pow((float)10.0, renderer_params.detail); 
   vec3 from;
-
-  SET_POINT(from, camera_params.camPos)
-
+  
+  
+  SET_POINT(from,camera_params.camPos)
+  
   const int height = renderer_params.height;
-  const int width = renderer_params.width;
-  int j;
+  const int width  = renderer_params.width;
+  const int area   = width * height;
 
-  // float time = getTime();
+  float *farPoint = (float*) malloc(sizeof(float)*3*area);
 
+  //int *ai = (int*) malloc(sizeof(int)*area);
 
-  float *distance_to_pixel_array;
-  float *distance_to_point_array;
-  vec3  *distance_vector_points;
-  float  step_size   = 0.01;
-  int    pin_spacing = 5;
+  vec3 *to = (vec3*) malloc(sizeof(vec3) * area);
+  pixelData *pix = (pixelData*) malloc(sizeof(pixelData) * area);
+  vec3* col = (vec3*) malloc(sizeof(vec3) * area);
 
-  // int check_frame_path = 30;
-  distance_to_pixel_array =
-    (float *)malloc(sizeof(float) * (width * height / pin_spacing));
-  distance_to_point_array =
-    (float *)malloc(sizeof(float) * (width * height / pin_spacing));
-  distance_vector_points =
-    (vec3 *)malloc(sizeof(vec3) * (width * height / pin_spacing));
-  int   pixel_count                = 0;
-  int   distance_to_pixel_index    = 0;
-  int   min_reached_flag           = 0;
-  float max_threshold              = 3;
-  float change_direction_threshold = 0.06;
-  float min_threshold              = 0.03;
-  srand(time(NULL));
-
-#pragma omp parallel for default(shared) schedule(dynamic) num_threads(4)
-
-  for (j = 0; j < height; j++) {
-    int i = 0;
-
-    for (i = 0; i < width; i++) {
-      pixelData pix_data;
-      vec3  color;
-      float farPoint[3];
-      vec3  to;
-
-      // get point on the 'far' plane
-      // since we render one frame only,
-      // we can use the more specialized method
-      UnProject(i, j, camera_params, farPoint);
-
-      // to = farPoint - camera_params.camPos
-      to = SUBDUBDUB(farPoint, camera_params.camPos);
-      NORMALIZE(to);
-
-      // render the pixel
-
-      // render the pixel
-      float distance_to_pixel = rayMarch(renderer_params,
-                                         from,
-                                         to,
-                                         eps,
-                                         pix_data,
-                                         mandelBox_params);
-
-      if ((i % pin_spacing == 0) && (j % pin_spacing == 0)) {
-        distance_to_pixel_array[distance_to_pixel_index] = distance_to_pixel;
-        distance_vector_points[distance_to_pixel_index]  = pix_data.hit;
-        float new_distance =
-          sqrtf(powf(pix_data.hit.x - camera_position_array[0], 2)
-                + powf(pix_data.hit.y -
-                       camera_position_array[1],
-                       2) + powf(pix_data.hit.z - camera_position_array[3], 2));
-        distance_to_point_array[distance_to_pixel_index] = new_distance;
-
-        if (new_distance < min_threshold) {
-          min_reached_flag = 1;
-        }
-        distance_to_pixel_index++;
-      }
-
-      // get the colour at this pixel
-      color = getColour(pix_data, renderer_params, from, to);
-
-      // save colour into texture
-      int k = (j * width + i) * 3;
-      image[k + 2] = (unsigned char)(color.x * 255);
-      image[k + 1] = (unsigned char)(color.y * 255);
-      image[k]     = (unsigned char)(color.z * 255);
-      pixel_count++;
-    } // inner for
-      // printProgress((j+1)/(float)height,getTime()-time);
-  }   // end of outer for
-
-  if (min_reached_flag == 1) {
-    move_position                  = 0;
-    camera_angle_changes_array[0] += ((rand() % 200) - 100) * .01;
-    camera_angle_changes_array[1] += ((rand() % 200) - 100) * .01;
-    camera_angle_changes_array[2] += ((rand() % 200) - 100) * .01;
+#pragma omp parallel for
+  for (int i = 1; i<area; i++){
+  UnProject(i%width, i/width, camera_params, &farPoint[i*3]);
   }
-
-  if (move_position == 1) {
-    float vector_distance =
-          sqrtf(powf(camera_angle_array[0] - camera_position_array[0], 2)
-            + powf(camera_angle_array[1] -
-                   camera_position_array[1],
-                   2) + powf(camera_angle_array[3] - camera_position_array[3], 2));
-
-    float t = step_size / vector_distance;
-    camera_position_array[0] += t *
-                                (camera_angle_array[0] - camera_position_array[0]);
-    camera_position_array[1] += t *
-                                (camera_angle_array[1] - camera_position_array[1]);
-    camera_position_array[2] += t *
-                                (camera_angle_array[2] - camera_position_array[2]);
-
-    if ((vector_distance < change_direction_threshold) || (frame_no == 0)) {
-      printf("\nVector Size: %f \n", vector_distance);
-      move_position = 0;
-      int   max_index            = 0;
-      int   found_flag           = 0;
-      float current_max          = 0;
-      float current_max_distance = 0;
-      vec3  current_max_vector_point;
-
-      // while (found_flag == 0){
-
-      //     if (distance_to_pixel_array[max_index] < 0.0002){
-      //         current_max = distance_to_pixel_array[max_index];
-      //         current_max_vector_point = distance_vector_points[max_index];
-      //         current_max_distance = distance_to_point_array[max_index];
-      //         found_flag = 1;
-      //     }
-      //     max_index++;
-      // }
-
-      // for (;max_index < distance_to_pixel_index; max_index++){
-      //     if (distance_to_pixel_array[max_index] > current_max &&
-      // distance_to_pixel_array[max_index] < 0.0002){
-      //         current_max = distance_to_pixel_array[max_index];
-      //         current_max_vector_point = distance_vector_points[max_index];
-      //         current_max_distance = distance_to_point_array[max_index];
-      //     }
-
-      // }
-      // printf("\nPixel Furthest: %f Point Furthest: %f\n",  current_max,
-      // current_max_distance);
-      max_index = 0;
-
-      while (found_flag == 0) {
-        if (distance_to_point_array[max_index] < max_threshold) {
-          current_max              = distance_to_point_array[max_index];
-          current_max_vector_point = distance_vector_points[max_index];
-          current_max_distance     = distance_to_pixel_array[max_index];
-          found_flag               = 1;
-        }
-        max_index++;
-      }
-
-      for (; max_index < distance_to_pixel_index; max_index++) {
-        if ((distance_to_point_array[max_index] > current_max) &&
-            (distance_to_point_array[max_index] < max_threshold)) {
-          current_max              = distance_to_point_array[max_index];
-          current_max_vector_point = distance_vector_points[max_index];
-          current_max_distance     = distance_to_pixel_array[max_index];
-        }
-      }
-
-      // printf("\nPoint Furthest: %f Pixel Furthest: %f\n",  current_max,
-      // current_max_distance);
-      camera_angle_changes_array[0] = current_max_vector_point.x;
-      camera_angle_changes_array[1] = current_max_vector_point.y;
-      camera_angle_changes_array[2] = current_max_vector_point.z;
-
-      printf("\nNew Angle: %f %f %f\n",
-             camera_angle_changes_array[0],
-             camera_angle_changes_array[1],
-             camera_angle_changes_array[2]);
-    }
-  }
-  else
-  {
-    float vector_distance =
-      sqrtf(powf(camera_angle_changes_array[0] - camera_angle_array[0], 2)
-            + powf(camera_angle_changes_array[1] -
-                   camera_angle_array[1], 2)
-            + powf(camera_angle_changes_array[3] -
-                   camera_angle_array[3], 2));
-
-    float t = 0.20; // *(step_size/vector_distance);
-
-    if (vector_distance < 0.05) {
-      camera_angle_array[0] = camera_angle_changes_array[0];
-      camera_angle_array[1] = camera_angle_changes_array[1];
-      camera_angle_array[2] = camera_angle_changes_array[2];
-
-      move_position = 1;
-    }
-    camera_angle_array[0] += t *
-                             (camera_angle_changes_array[0] -
-                              camera_angle_array[0]);
-    camera_angle_array[1] += t *
-                             (camera_angle_changes_array[1] -
-                              camera_angle_array[1]);
-    camera_angle_array[2] += t *
-                             (camera_angle_changes_array[2] -
-                              camera_angle_array[2]);
-  }
-  printf("\n rendering done:\n");
+//int i = 0;
 
 
-  free(distance_to_pixel_array);
-  free(distance_to_point_array);
+  //int j;
+  //float time = getTime();
+  
+#pragma acc data copyout(image[0:3*area]) create(to[0:area],pix[0:area],col[0:area]) pcopyin(eps,from,renderer_params,mandelBox_params,camera_params)
+//, area, width, height, farPoint[0:area*3])
+{
+
+//[j * width +// i]
+//#pragma omp parallel for default(shared) schedule(dynamic) num_threads(4)
+
+//  for(j = 0; j < height; j++){
+ //     int i=0;  
+ //     for(i = 0; i <width; i++){
+#pragma acc kernels
+{
+
+#pragma acc for independent
+      for(int i = 0; i < area; i++){
+	//int ai = i;
+
+//     for (int i = 0; i < area; 
+	 //float farPoint[3]; //TODO: Move this
+	  
+
+	  //foo();
+
+	  // get point on the 'far' plane
+	  // since we render one frame only, 
+	  // we can use the more specialized method
+
+	  
+	
+
+	  //UnProject(i, j, camera_params, farPoint);
+	
+	   
+	  
+	  // to = farPoint - camera_params.camPos
+	  //vec3 temp = 
+	  
+          //to[i].x = temp.x; to[i].y = temp.y; to[i].z = temp.z;  //SUBDUBDUB(farPoint, camera_params.camPos);
+	 
+	  
+	  //render the pixel
+	 
+
+	  //get the colour at this pixel
+	  //col[i] = 
 
 
-  return move_position;
+	  VECESUBDUBDUB(to[i],farPoint,camera_params.camPos);
+	  NORMALIZE(to[i]);
+	  
+
+	  rayMarch(renderer_params, from, to[i], eps, pix[i], mandelBox_params);
+	  
+
+	  getColour(pix[i], renderer_params, from, to[i], &col[i]);
+
+	  //save colour into texture
+	  //int k = (j * width + i)*3;
+	  image[i*3+2] = (unsigned char)(col[i].x * 255);
+	  image[i*3+1] = (unsigned char)(col[i].y * 255);
+	  image[i*3]   = (unsigned char)(col[i].z * 255);
+	} // inner for
+      //printProgress((j+1)/(float)height,getTime()-time);
+    //}//end of outer for
 }
-
+}
+  printf("\n rendering done:\n");
+}

@@ -17,7 +17,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 #ifndef _3d_H
 #define _3d_H
@@ -30,43 +30,17 @@
 #include "renderer.h"
 
 
-void LoadIdentity(float *matrix);
-void Perspective(float  fov,
-                 float  aspect,
-                 float  zNear,
-                 float  zFar,
-                 float *projMatrix);
-void Frustum(float  left,
-             float  right,
-             float  bottom,
-             float  top,
-             float  znear,
-             float  zfar,
-             float *matrix);
-void LookAt(float *eye,
-            float *target,
-            float *up,
-            float *modelMatrix);
-float LengthVector(float *vector);
-void  NormalizeVector(float *vector);
-void  ComputeNormalOfPlane(float *normal,
-                           float *v1,
-                           float *v2);
-void  MultiplyMatrices(float       *result,
-                       const float *matrix1,
-                       const float *matrix2);
-void  MultiplyMatrixByVector(float *resultvector,
-                             float *matrix,
-                             float *pvector);
-int   InvertMatrix(float *m,
-                   float *out);
-void  Translate(float *result,
-                float  x,
-                float  y,
-                float  z);
-int UnProject(float        winX,
-              float        winY,
-              CameraParams camP,
-              float       *obj);
+void   LoadIdentity   (float *matrix);
+void   Perspective    (float fov, float aspect, float zNear, float zFar, float *projMatrix);
+void   Frustum        (float left, float right, float bottom, float top, float znear, float zfar, float *matrix);
+void   LookAt         (float *eye, float *target, float *up, float *modelMatrix);
+float LengthVector   (float *vector);
+void   NormalizeVector(float *vector);
+void   ComputeNormalOfPlane(float *normal, float *v1, float *v2);
+void   MultiplyMatrices(float *result, const float *matrix1, const float *matrix2);
+void   MultiplyMatrixByVector(float *resultvector, float *matrix, float *pvector);
+int    InvertMatrix(float *m, float *out);
+void   Translate(float *result, float x, float y, float z);
+int    UnProject(float winX, float winY, CameraParams camP, float *obj);
 
-#endif // ifndef _3d_H
+#endif

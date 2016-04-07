@@ -1,3 +1,2 @@
 #!/bin/bash
-##52.34.230.166
-ssh -i ~/.ssh/Kyle-key-pair-oregon.pem  ec2-user@52.36.82.20
+ssh -i ~/.ssh/Kyle-key-pair-oregon.pem  ec2-user@52.34.230.166

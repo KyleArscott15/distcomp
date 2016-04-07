@@ -25,8 +25,5 @@
 1
 #brightness
 1.2
-#super sampling anti aliasing 0 = off, 1 = on
-0
-#
 #FILE NAME
 image2.bmp
