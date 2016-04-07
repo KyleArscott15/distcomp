@@ -41,6 +41,6 @@ void   MultiplyMatrices(float *result, const float *matrix1, const float *matrix
 void   MultiplyMatrixByVector(float *resultvector, float *matrix, float *pvector);
 int    InvertMatrix(float *m, float *out);
 void   Translate(float *result, float x, float y, float z);
-int    UnProject(float winX, float winY, CameraParams camP, float *obj);
+int    UnProject(float winX, float winY, const CameraParams &camP, float *obj);
 
 #endif

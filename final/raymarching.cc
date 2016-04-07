@@ -46,9 +46,7 @@ inline void Normalize(vec3 &p) {
       }							
   }
 
-
-
-inline void normal(const vec3 & p, vec3 & normal, MandelBoxParams &mandelBox_params)
+inline void normal(const vec3 &p, vec3 &normal, MandelBoxParams &mandelBox_params)
 {
   // compute the normal at p
   const float sqrt_mach_eps = 3.4527e-04;// 1.4901e-08;

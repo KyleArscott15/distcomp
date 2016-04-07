@@ -1,7 +1,7 @@
 #-std=gnu++0x
 CC       =  pgCC
 CXX      =  pgCC
-FLAGS    = -lm -fast -Mautoinline:maxsize:1000 -acc -mp -Minfo -O2 -ta=tesla,cc30 #-DVERSION_ACC #-DTEST -O3 -Wall -std=gnu++0x -fopenmp -g -pg #-E
+FLAGS    = -lm -fast -Mautoinline:maxsize:1000 -acc -mp -Minfo -O2 -ta=tesla,cc30 -pg  #-DVERSION_ACC #-DTEST -O3 -Wall -std=gnu++0x -fopenmp -g -pg #-E
 ACCFLAGS = -DBULB -E -std=gnu++0x -I.  -fast -acc -Minfo -O2 -ta=tesla,cc30 #-DVERSION_ACC -g -pg
 CFLAGS   = $(FLAGS)
 CXXFLAGS = $(FLAGS)

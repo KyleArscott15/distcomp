@@ -42,9 +42,11 @@ int main(int argc, char** argv)
 
   init3D(&camera_params, &renderer_params);
 
-  renderFractal(camera_params, renderer_params, image, mandelBox_params);
-  
-  saveBMP(renderer_params.file_name, image, renderer_params.width, renderer_params.height);
+  int x=0;
+  for(;x<2;x++){
+    renderFractal(camera_params, renderer_params, image, mandelBox_params);
+    saveBMP(renderer_params.file_name, image, renderer_params.width, renderer_params.height);
+  }
   
   free(image);
 
